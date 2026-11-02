@@ -1,0 +1,72 @@
+digraph ERD {
+  graph [rankdir=LR, splines=spline, nodesep=0.7, ranksep=1.5, pad=0.4, fontname="Helvetica",
+         label=<<B>Offline Food Store - Entity Relationship Diagram</B>>, labelloc=t, fontsize=20];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, dir=both, color="#37474F", penwidth=1.4,
+         arrowsize=1.1, labeldistance=2.2, labelfontsize=11];
+
+  Customer [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#2E7D32">
+      <TR><TD COLSPAN="3" BGCOLOR="#2E7D32"><FONT COLOR="white"><B>Customer</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">customer_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">first_name</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">last_name</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">phone_number</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">email_address (unique)</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+    </TABLE>>];
+
+  Category [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#2E7D32">
+      <TR><TD COLSPAN="3" BGCOLOR="#2E7D32"><FONT COLOR="white"><B>Category</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">category_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">name (unique)</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+    </TABLE>>];
+
+  Product [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#2E7D32">
+      <TR><TD COLSPAN="3" BGCOLOR="#2E7D32"><FONT COLOR="white"><B>Product</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">product_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">category_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">name</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">description</TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">price (current)</TD><TD ALIGN="LEFT">REAL (decimal)</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">stock_quantity</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+    </TABLE>>];
+
+  CartItem [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#EF6C00">
+      <TR><TD COLSPAN="3" BGCOLOR="#EF6C00"><FONT COLOR="white"><B>CartItem</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">cart_item_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">customer_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">product_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">quantity (&gt; 0)</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD COLSPAN="3" ALIGN="LEFT"><I>unique (customer_id, product_id)</I></TD></TR>
+    </TABLE>>];
+
+  Order [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#1565C0">
+      <TR><TD COLSPAN="3" BGCOLOR="#1565C0"><FONT COLOR="white"><B>Order</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">order_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">customer_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">order_date</TD><TD ALIGN="LEFT">TEXT (DateTime)</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">total</TD><TD ALIGN="LEFT">REAL (decimal)</TD></TR>
+    </TABLE>>];
+
+  OrderItem [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="white" COLOR="#1565C0">
+      <TR><TD COLSPAN="3" BGCOLOR="#1565C0"><FONT COLOR="white"><B>OrderItem</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B></TD><TD ALIGN="LEFT">order_item_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">order_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>FK</B></TD><TD ALIGN="LEFT">product_id</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">quantity (&gt; 0)</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD></TD><TD ALIGN="LEFT">unit_price (price paid)</TD><TD ALIGN="LEFT">REAL (decimal)</TD></TR>
+    </TABLE>>];
+
+  // parent (one, mandatory) -> child (many, optional / mandatory)
+  Category -> Product   [arrowtail=teetee, arrowhead=crowodot, label="groups",           taillabel="1", headlabel="0..*"];
+  Customer -> CartItem  [arrowtail=teetee, arrowhead=crowodot, label="has in cart",      taillabel="1", headlabel="0..*"];
+  Product  -> CartItem  [arrowtail=teetee, arrowhead=crowodot, label="is added as",      taillabel="1", headlabel="0..*"];
+  Customer -> Order     [arrowtail=teetee, arrowhead=crowodot, label="places",           taillabel="1", headlabel="0..*"];
+  Order    -> OrderItem [arrowtail=teetee, arrowhead=crowtee,  label="contains",         taillabel="1", headlabel="1..*"];
+  Product  -> OrderItem [arrowtail=teetee, arrowhead=crowodot, label="is sold as",       taillabel="1", headlabel="0..*"];
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ShoppingApp.Views.CataloguePage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ShoppingApp.ViewModels"
+             xmlns:models="clr-namespace:ShoppingApp.Models"
+             x:DataType="vm:CatalogueViewModel"
+             Title="Catalogue"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="10">
+
+        <!-- Who is shopping + cart count -->
+        <Border Grid.Row="0" Style="{StaticResource Card}"
+                BackgroundColor="{StaticResource BrandSoft}"
+                Stroke="{StaticResource BrandBrush}">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout VerticalOptions="Center" Spacing="2">
+                    <Label Text="Shopping as" FontSize="12" TextColor="#4B5563" />
+                    <Label Text="{Binding CustomerName}" FontSize="18" FontAttributes="Bold"
+                           TextColor="{StaticResource BrandDark}" />
+                    <Label Text="{Binding CartCount, StringFormat='Items in cart: {0}'}"
+                           FontSize="14" TextColor="#374151" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="1"
+                        Text="View cart"
+                        Style="{StaticResource PrimaryButton}"
+                        HeightRequest="42"
+                        VerticalOptions="Center"
+                        Command="{Binding OpenCartCommand}" />
+            </Grid>
+        </Border>
+
+        <SearchBar Grid.Row="1"
+                   Placeholder="Search products or categories"
+                   Text="{Binding SearchText}" />
+
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Products}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedProduct, Mode=TwoWay}">
+
+            <CollectionView.EmptyView>
+                <Label Text="No products match your search."
+                       Style="{StaticResource Muted}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ProductListItem">
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="12">
+                            <Label Text="{Binding Name}" Style="{StaticResource ItemTitle}" />
+                            <Label Grid.Row="1" Text="{Binding CategoryName}" Style="{StaticResource Muted}" />
+
+                            <Label Grid.Column="1"
+                                   Text="{Binding Price, StringFormat='R{0:N2}'}"
+                                   Style="{StaticResource Price}"
+                                   HorizontalOptions="End" />
+                            <Label Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding StockQuantity, StringFormat='Stock: {0}'}"
+                                   Style="{StaticResource Muted}"
+                                   HorizontalOptions="End">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding StockQuantity}" Value="0">
+                                        <Setter Property="TextColor" Value="{StaticResource ErrorRed}" />
+                                        <Setter Property="FontAttributes" Value="Bold" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

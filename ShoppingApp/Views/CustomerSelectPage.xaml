@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ShoppingApp.Views.CustomerSelectPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ShoppingApp.ViewModels"
+             xmlns:models="clr-namespace:ShoppingApp.Models"
+             x:DataType="vm:CustomerSelectViewModel"
+             Title="Select Customer"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="14">
+
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Who's shopping today?" Style="{StaticResource Headline}" />
+            <Label Text="Tap your name to open the store. No login needed."
+                   Style="{StaticResource Muted}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Customers}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                       Color="{StaticResource Brand}" />
+                    <Label Text="No customers found." Style="{StaticResource Muted}"
+                           IsVisible="{Binding IsNotBusy}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Customer">
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                            <Border WidthRequest="48" HeightRequest="48"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 24"
+                                    BackgroundColor="{StaticResource Brand}"
+                                    Padding="0">
+                                <Label Text="{Binding Initials}" TextColor="White"
+                                       FontAttributes="Bold" FontSize="17"
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <Label Text="{Binding FullName}" Style="{StaticResource ItemTitle}" />
+                                <Label Text="{Binding EmailAddress}" Style="{StaticResource Muted}" />
+                                <Label Text="{Binding PhoneNumber}" Style="{StaticResource Muted}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

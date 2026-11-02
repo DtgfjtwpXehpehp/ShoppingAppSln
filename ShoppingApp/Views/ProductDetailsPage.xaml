@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ShoppingApp.Views.ProductDetailsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ShoppingApp.ViewModels"
+             x:DataType="vm:ProductDetailsViewModel"
+             Title="Product Details"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <!-- Product info -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding Product.Name}" Style="{StaticResource Headline}" />
+                    <Label Text="{Binding CategoryName}" Style="{StaticResource Muted}" />
+                    <Label Text="{Binding Product.Price, StringFormat='R{0:N2}'}"
+                           FontSize="28" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Brand}, Dark=#81C784}" />
+                    <Label Text="{Binding Product.Description}" Style="{StaticResource Body}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Stock -->
+            <Border Style="{StaticResource Card}">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding Product.StockQuantity}" FontSize="22" FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource TextLight}, Dark={StaticResource TextDark}}" />
+                        <Label Text="In stock" Style="{StaticResource Muted}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                        <Label Text="{Binding InCart}" FontSize="22" FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource TextLight}, Dark={StaticResource TextDark}}" />
+                        <Label Text="In your cart" Style="{StaticResource Muted}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                        <Label Text="{Binding Remaining}" FontSize="22" FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Brand}, Dark=#81C784}" />
+                        <Label Text="Can still add" Style="{StaticResource Muted}" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Add to cart -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Quantity" Style="{StaticResource ItemTitle}" />
+                    <Entry Text="{Binding QuantityText}"
+                           Keyboard="Numeric"
+                           Placeholder="Enter a whole number"
+                           MaxLength="4" />
+
+                    <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           Style="{StaticResource ErrorText}" />
+
+                    <Button Text="Add to Cart"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding AddToCartCommand}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="View cart"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ViewCartCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
