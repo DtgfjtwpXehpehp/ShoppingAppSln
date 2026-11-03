@@ -25,4 +25,7 @@ public interface IStoreService
     Task RemoveCartItemAsync(int cartItemId);
 
     Task<CheckoutResult> CheckoutAsync(int customerId);
+
+    /// <summary>The customer's past orders, newest first, each with its lines.</summary>
+    Task<List<OrderSummary>> GetOrderHistoryAsync(int customerId);
 }

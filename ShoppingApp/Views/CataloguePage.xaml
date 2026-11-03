@@ -8,7 +8,7 @@
              Title="Catalogue"
              BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="10">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="12,12,12,0" RowSpacing="10">
 
         <!-- Who is shopping + cart count -->
         <Border Grid.Row="0" Style="{StaticResource Card}"
@@ -23,12 +23,16 @@
                            FontSize="14" TextColor="#374151" />
                 </VerticalStackLayout>
 
-                <Button Grid.Column="1"
-                        Text="View cart"
-                        Style="{StaticResource PrimaryButton}"
-                        HeightRequest="42"
-                        VerticalOptions="Center"
-                        Command="{Binding OpenCartCommand}" />
+                <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                    <Button Text="View cart"
+                            Style="{StaticResource PrimaryButton}"
+                            HeightRequest="38" FontSize="13"
+                            Command="{Binding OpenCartCommand}" />
+                    <Button Text="Order history"
+                            Style="{StaticResource SecondaryButton}"
+                            HeightRequest="38" FontSize="13"
+                            Command="{Binding OpenOrderHistoryCommand}" />
+                </VerticalStackLayout>
             </Grid>
         </Border>
 
@@ -36,10 +40,15 @@
                    Placeholder="Search products or categories"
                    Text="{Binding SearchText}" />
 
+        <!-- Product cards, two per row -->
         <CollectionView Grid.Row="2"
                         ItemsSource="{Binding Products}"
                         SelectionMode="Single"
                         SelectedItem="{Binding SelectedProduct, Mode=TwoWay}">
+
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="2" />
+            </CollectionView.ItemsLayout>
 
             <CollectionView.EmptyView>
                 <Label Text="No products match your search."
@@ -49,28 +58,97 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:ProductListItem">
-                    <Border Style="{StaticResource Card}" Margin="0,0,0,10">
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="12">
-                            <Label Text="{Binding Name}" Style="{StaticResource ItemTitle}" />
-                            <Label Grid.Row="1" Text="{Binding CategoryName}" Style="{StaticResource Muted}" />
 
-                            <Label Grid.Column="1"
-                                   Text="{Binding Price, StringFormat='R{0:N2}'}"
-                                   Style="{StaticResource Price}"
-                                   HorizontalOptions="End" />
-                            <Label Grid.Row="1" Grid.Column="1"
-                                   Text="{Binding StockQuantity, StringFormat='Stock: {0}'}"
-                                   Style="{StaticResource Muted}"
-                                   HorizontalOptions="End">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding StockQuantity}" Value="0">
-                                        <Setter Property="TextColor" Value="{StaticResource ErrorRed}" />
-                                        <Setter Property="FontAttributes" Value="Bold" />
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
-                        </Grid>
-                    </Border>
+                    <!-- Transparent root so the platform's selection highlight never paints over the card -->
+                    <Grid Padding="5,4,5,10" BackgroundColor="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter TargetName="ProductCardBorder" Property="Scale" Value="0.97" />
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Border x:Name="ProductCardBorder"
+                                Style="{StaticResource ProductCard}"
+                                HeightRequest="290">
+                            <Border.Shadow>
+                                <Shadow Brush="Black" Opacity="0.12" Radius="14" Offset="0,6" />
+                            </Border.Shadow>
+
+                            <Grid RowDefinitions="115,*,Auto" RowSpacing="8" Padding="12">
+
+                                <!-- Image area: gradient + emoji fallback + picture + badge -->
+                                <Border Grid.Row="0" StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12" Padding="0">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                                            <GradientStop Color="{StaticResource CardAccentLight}" Offset="0.0" />
+                                            <GradientStop Color="{StaticResource CardAccentMid}" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+
+                                    <Grid>
+                                        <!-- Sits under the picture: shows only if the image file is missing -->
+                                        <Label Text="{Binding Emoji}" FontSize="46"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Image Source="{Binding ImageSourcePath}" Aspect="AspectFill"
+                                               IsVisible="{Binding HasImage}" />
+
+                                        <Border IsVisible="{Binding HasBadge}"
+                                                HorizontalOptions="End" VerticalOptions="Start"
+                                                Margin="6" Padding="8,3"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 99"
+                                                BackgroundColor="{StaticResource BadgeGreen}">
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding Stock}" Value="0">
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource ErrorRed}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Label Text="{Binding BadgeText}" TextColor="White"
+                                                   FontSize="10" FontAttributes="Bold" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Category, name, description -->
+                                <VerticalStackLayout Grid.Row="1" Spacing="3">
+                                    <Label Text="{Binding CategoryName}"
+                                           FontSize="10" FontAttributes="Bold" CharacterSpacing="0.5"
+                                           LineBreakMode="TailTruncation" MaxLines="1"
+                                           TextColor="{AppThemeBinding Light={StaticResource CardAccent}, Dark={StaticResource CardAccentLight}}" />
+                                    <Label Text="{Binding ProductName}" Style="{StaticResource CardTitle}" />
+                                    <Label Text="{Binding ProductDescription}" Style="{StaticResource CardDescription}" />
+                                </VerticalStackLayout>
+
+                                <!-- Price, stock and the round "+" button -->
+                                <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                    <VerticalStackLayout VerticalOptions="Center">
+                                        <Label Text="{Binding Price, StringFormat='R{0:N2}'}"
+                                               FontSize="16" FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light={StaticResource CardTitleLight}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Stock, StringFormat='Stock: {0}'}"
+                                               Style="{StaticResource Muted}" FontSize="11" />
+                                    </VerticalStackLayout>
+
+                                    <Border Grid.Column="1" WidthRequest="32" HeightRequest="32"
+                                            StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="0"
+                                            BackgroundColor="{StaticResource CardAccent}"
+                                            VerticalOptions="Center">
+                                        <Label Text="+" TextColor="White" FontSize="20" FontAttributes="Bold"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

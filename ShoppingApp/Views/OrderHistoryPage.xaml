@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ShoppingApp.Views.OrderHistoryPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ShoppingApp.ViewModels"
+             xmlns:models="clr-namespace:ShoppingApp.Models"
+             x:DataType="vm:OrderHistoryViewModel"
+             Title="Order History"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <Grid RowDefinitions="Auto,*" Padding="16,12,16,0" RowSpacing="10">
+
+        <VerticalStackLayout Spacing="2">
+            <Label Text="{Binding CustomerName}" Style="{StaticResource Headline}" FontSize="22" />
+            <Label Text="{Binding SummaryText}" Style="{StaticResource Muted}" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Orders}" SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="6">
+                    <Label Text="🧾" FontSize="40" HorizontalOptions="Center" />
+                    <Label Text="No orders yet" Style="{StaticResource ItemTitle}" HorizontalOptions="Center" />
+                    <Label Text="Orders appear here after you check out." Style="{StaticResource Muted}"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:OrderSummary">
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                        <VerticalStackLayout Spacing="10">
+
+                            <!-- Header: order number, date, total -->
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="{Binding OrderId, StringFormat='Order #{0}'}"
+                                           Style="{StaticResource ItemTitle}" />
+                                    <Label Text="{Binding OrderDate, StringFormat='{0:dd MMM yyyy}'}"
+                                           Style="{StaticResource Muted}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                    <Label Text="{Binding TotalAmount, StringFormat='R{0:N2}'}"
+                                           Style="{StaticResource Price}" HorizontalOptions="End" />
+                                    <Label Text="{Binding ItemCountText}"
+                                           Style="{StaticResource Muted}" HorizontalOptions="End" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <BoxView HeightRequest="1"
+                                     Color="{AppThemeBinding Light={StaticResource StrokeLight}, Dark={StaticResource StrokeDark}}" />
+
+                            <!-- What was bought, at the price paid then -->
+                            <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Lines}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:OrderLine">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <Label Text="{Binding Quantity, StringFormat='{0}×'}"
+                                                   Style="{StaticResource Body}" FontAttributes="Bold" />
+                                            <VerticalStackLayout Grid.Column="1">
+                                                <Label Text="{Binding ProductName}" Style="{StaticResource Body}"
+                                                       LineBreakMode="TailTruncation" MaxLines="1" />
+                                                <Label Text="{Binding UnitPrice, StringFormat='R{0:N2} each'}"
+                                                       Style="{StaticResource Muted}" FontSize="11" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="2" Text="{Binding LineTotal, StringFormat='R{0:N2}'}"
+                                                   Style="{StaticResource Body}" VerticalOptions="Start" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

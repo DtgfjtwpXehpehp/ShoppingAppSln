@@ -2,7 +2,7 @@ using SQLite;
 
 namespace ShoppingApp.Models;
 
-[Table("OrderItem")]
+[Table("Order_item")]
 public class OrderItem
 {
     [PrimaryKey, AutoIncrement, Column("order_item_id")]

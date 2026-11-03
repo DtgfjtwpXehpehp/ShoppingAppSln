@@ -73,13 +73,16 @@ public partial class CatalogueViewModel : BaseViewModel
     [RelayCommand]
     private Task OpenCartAsync() => _navigation.GoToAsync(Routes.Cart);
 
+    [RelayCommand]
+    private Task OpenOrderHistoryAsync() => _navigation.GoToAsync(Routes.OrderHistory);
+
     private void ApplyFilter()
     {
         var term = SearchText?.Trim() ?? string.Empty;
 
         var matches = _allProducts.Where(p =>
             term.Length == 0 ||
-            p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            p.ProductName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
             p.CategoryName.Contains(term, StringComparison.OrdinalIgnoreCase));
 
         Products.Clear();

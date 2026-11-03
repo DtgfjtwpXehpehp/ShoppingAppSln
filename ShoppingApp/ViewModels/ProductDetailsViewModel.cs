@@ -27,10 +27,15 @@ public partial class ProductDetailsViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Remaining))]
+    [NotifyPropertyChangedFor(nameof(Emoji))]
     private Product? _product;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Emoji))]
     private string _categoryName = string.Empty;
+
+    /// <summary>Shown instead of a picture when the product has no image.</summary>
+    public string Emoji => ProductVisuals.EmojiFor(CategoryName, Product?.ProductName);
 
     /// <summary>Units of this product already in the current customer's cart.</summary>
     [ObservableProperty]
@@ -47,7 +52,7 @@ public partial class ProductDetailsViewModel : BaseViewModel
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
     /// <summary>How many more units can still be added.</summary>
-    public int Remaining => Math.Max(0, (Product?.StockQuantity ?? 0) - InCart);
+    public int Remaining => Math.Max(0, (Product?.Stock ?? 0) - InCart);
 
     partial void OnProductIdChanged(int value)
     {

@@ -10,15 +10,32 @@
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="14">
 
+            <!-- Picture (emoji placeholder when the product has no image) -->
+            <Border HeightRequest="190" StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                        <GradientStop Color="{StaticResource CardAccentLight}" Offset="0.0" />
+                        <GradientStop Color="{StaticResource CardAccentMid}" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <!-- Sits under the picture: shows only if the image file is missing -->
+                    <Label Text="{Binding Emoji}" FontSize="72"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Image Source="{Binding Product.ImageSourcePath}" Aspect="AspectFill"
+                           IsVisible="{Binding Product.HasImage}" />
+                </Grid>
+            </Border>
+
             <!-- Product info -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="{Binding Product.Name}" Style="{StaticResource Headline}" />
+                    <Label Text="{Binding Product.ProductName}" Style="{StaticResource Headline}" />
                     <Label Text="{Binding CategoryName}" Style="{StaticResource Muted}" />
                     <Label Text="{Binding Product.Price, StringFormat='R{0:N2}'}"
                            FontSize="28" FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Brand}, Dark=#81C784}" />
-                    <Label Text="{Binding Product.Description}" Style="{StaticResource Body}" />
+                    <Label Text="{Binding Product.ProductDescription}" Style="{StaticResource Body}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -26,7 +43,7 @@
             <Border Style="{StaticResource Card}">
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding Product.StockQuantity}" FontSize="22" FontAttributes="Bold"
+                        <Label Text="{Binding Product.Stock}" FontSize="22" FontAttributes="Bold"
                                HorizontalOptions="Center"
                                TextColor="{AppThemeBinding Light={StaticResource TextLight}, Dark={StaticResource TextDark}}" />
                         <Label Text="In stock" Style="{StaticResource Muted}" HorizontalOptions="Center" />

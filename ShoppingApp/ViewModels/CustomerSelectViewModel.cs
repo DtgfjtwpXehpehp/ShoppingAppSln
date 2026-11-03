@@ -21,7 +21,27 @@ public partial class CustomerSelectViewModel : BaseViewModel
         _navigation = navigation;
     }
 
+    private List<Customer> _allCustomers = new();
+
     public ObservableCollection<Customer> Customers { get; } = new();
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    private void ApplyFilter()
+    {
+        var term = SearchText?.Trim() ?? string.Empty;
+        var matches = _allCustomers.Where(c =>
+            term.Length == 0 ||
+            c.FullName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            c.EmailAddress.Contains(term, StringComparison.OrdinalIgnoreCase));
+
+        Customers.Clear();
+        foreach (var c in matches)
+            Customers.Add(c);
+    }
 
     [ObservableProperty]
     private Customer? _selectedCustomer;
@@ -47,11 +67,8 @@ public partial class CustomerSelectViewModel : BaseViewModel
         await RunSafeAsync(async () =>
         {
             _session.CurrentCustomer = null;
-            var customers = await _store.GetCustomersAsync();
-
-            Customers.Clear();
-            foreach (var c in customers)
-                Customers.Add(c);
+            _allCustomers = await _store.GetCustomersAsync();
+            ApplyFilter();
         });
         IsBusy = false;
     }

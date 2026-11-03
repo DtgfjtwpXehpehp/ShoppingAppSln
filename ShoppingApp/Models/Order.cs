@@ -15,6 +15,6 @@ public class Order
     [Column("order_date")]
     public DateTime OrderDate { get; set; }
 
-    [Column("total")]
-    public decimal Total { get; set; }
+    [Column("total_amount")]
+    public decimal TotalAmount { get; set; }
 }

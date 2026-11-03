@@ -8,7 +8,7 @@
              Title="Select Customer"
              BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
 
-    <Grid RowDefinitions="Auto,*" Padding="16" RowSpacing="14">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="12">
 
         <VerticalStackLayout Spacing="4">
             <Label Text="Who's shopping today?" Style="{StaticResource Headline}" />
@@ -16,7 +16,9 @@
                    Style="{StaticResource Muted}" />
         </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1"
+        <SearchBar Grid.Row="1" Placeholder="Search by name or email" Text="{Binding SearchText}" />
+
+        <CollectionView Grid.Row="2"
                         ItemsSource="{Binding Customers}"
                         SelectionMode="Single"
                         SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}">
