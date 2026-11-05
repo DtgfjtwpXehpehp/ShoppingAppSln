@@ -67,7 +67,7 @@
                                     <VisualState x:Name="Normal" />
                                     <VisualState x:Name="Selected">
                                         <VisualState.Setters>
-                                            <Setter TargetName="ProductCardBorder" Property="Scale" Value="0.97" />
+                                            <Setter Property="Scale" Value="0.97" />
                                             <Setter Property="BackgroundColor" Value="Transparent" />
                                         </VisualState.Setters>
                                     </VisualState>
@@ -75,9 +75,8 @@
                             </VisualStateGroupList>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Border x:Name="ProductCardBorder"
-                                Style="{StaticResource ProductCard}"
-                                HeightRequest="290">
+                        <Border Style="{StaticResource ProductCard}"
+                                HeightRequest="305">
                             <Border.Shadow>
                                 <Shadow Brush="Black" Opacity="0.12" Radius="14" Offset="0,6" />
                             </Border.Shadow>

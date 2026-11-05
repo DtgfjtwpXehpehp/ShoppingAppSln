@@ -18,10 +18,14 @@ public class ShellNavigationService : INavigationService
     public async Task PopToAsync(string pageName)
     {
         var nav = Shell.Current.Navigation;
-        while (nav.NavigationStack.Count > 1 &&
-               nav.NavigationStack[nav.NavigationStack.Count - 1]?.GetType().Name != pageName)
+
+        // Count > 1 guarantees the loop ends even if the page is not on the stack.
+        while (nav.NavigationStack.Count > 1 && !IsPage(nav.NavigationStack[nav.NavigationStack.Count - 1], pageName))
         {
             await nav.PopAsync(false);
         }
     }
+
+    private static bool IsPage(Page? page, string pageName) =>
+        page is not null && string.Equals(page.GetType().Name, pageName, StringComparison.OrdinalIgnoreCase);
 }

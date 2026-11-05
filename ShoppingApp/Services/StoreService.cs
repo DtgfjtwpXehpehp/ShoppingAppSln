@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using ShoppingApp.Models;
 using SQLite;
 
@@ -11,12 +12,13 @@ namespace ShoppingApp.Services;
 public class StoreService : IStoreService
 {
     private const string DbFileName = "OfflineShoppingApp.db";
+    private const string DbHashKey = "bundled_db_sha256";
 
     private readonly SemaphoreSlim _initLock = new(1, 1);
     private SQLiteAsyncConnection? _db;
 
     // ---------------------------------------------------------------- schema
-    // Identical to the schema in the ShoppingApps.db file; IF NOT EXISTS makes it a no-op when present.
+    // Identical to the schema in the OfflineShoppingApp.db file; IF NOT EXISTS makes it a no-op when present.
 
     private static readonly string[] Schema =
     {
@@ -77,12 +79,7 @@ public class StoreService : IStoreService
             if (_db is not null) return _db;
 
             var path = Path.Combine(FileSystem.AppDataDirectory, DbFileName);
-            if (!File.Exists(path))
-            {
-                await using var source = await FileSystem.OpenAppPackageFileAsync(DbFileName);
-                await using var target = File.Create(path);
-                await source.CopyToAsync(target);
-            }
+            await EnsureDatabaseFileAsync(path);
 
             var db = new SQLiteAsyncConnection(
                 path,
@@ -102,6 +99,34 @@ public class StoreService : IStoreService
         {
             _initLock.Release();
         }
+    }
+
+    /// <summary>
+    /// Copies the bundled database to the app data folder on first launch, and again whenever a
+    /// different database file is bundled (detected by hash) - so replacing the .db in the project
+    /// takes effect on the next run without uninstalling the app.
+    /// Orders placed inside the app are kept until the bundled file itself changes.
+    /// </summary>
+    private static async Task EnsureDatabaseFileAsync(string path)
+    {
+        byte[] bytes;
+        await using (var asset = await FileSystem.OpenAppPackageFileAsync(DbFileName))
+        using (var buffer = new MemoryStream())
+        {
+            await asset.CopyToAsync(buffer);
+            bytes = buffer.ToArray();
+        }
+
+        var hash = Convert.ToHexString(SHA256.HashData(bytes));
+        if (File.Exists(path) && Preferences.Get(DbHashKey, string.Empty) == hash)
+            return;
+
+        // Remove leftovers of the previous database before writing the new one.
+        foreach (var suffix in new[] { "-wal", "-shm", "-journal" })
+            File.Delete(path + suffix);
+
+        await File.WriteAllBytesAsync(path, bytes);
+        Preferences.Set(DbHashKey, hash);
     }
 
     // ------------------------------------------------------------------ seed
@@ -303,6 +328,12 @@ public class StoreService : IStoreService
             var existing = conn.Table<CartItem>()
                 .FirstOrDefault(c => c.CustomerId == customerId && c.ProductId == productId);
             var inCart = existing?.Quantity ?? 0;
+
+            if (product.Stock <= 0)
+            {
+                result = new OperationResult(false, $"Sorry, {product.ProductName} is sold out.");
+                return;
+            }
 
             if (inCart + quantity > product.Stock)
             {

@@ -64,8 +64,23 @@ public partial class CatalogueViewModel : BaseViewModel
         {
             CustomerName = customer.FullName;
             CartCount = await _store.GetCartCountAsync(customer.CustomerId);
-            _allProducts = await _store.GetProductsAsync();
-            ApplyFilter();
+
+            var fresh = await _store.GetProductsAsync();
+            if (SameProducts(_allProducts, fresh))
+            {
+                // Same products as before: only update stock/price. The list is not rebuilt,
+                // so the user keeps their scroll position when coming back from a product.
+                for (var i = 0; i < fresh.Count; i++)
+                {
+                    _allProducts[i].Stock = fresh[i].Stock;
+                    _allProducts[i].Price = fresh[i].Price;
+                }
+            }
+            else
+            {
+                _allProducts = fresh;
+                ApplyFilter();
+            }
         });
         IsBusy = false;
     }
@@ -75,6 +90,10 @@ public partial class CatalogueViewModel : BaseViewModel
 
     [RelayCommand]
     private Task OpenOrderHistoryAsync() => _navigation.GoToAsync(Routes.OrderHistory);
+
+    private static bool SameProducts(List<ProductListItem> current, List<ProductListItem> fresh) =>
+        current.Count == fresh.Count &&
+        current.Select(p => p.ProductId).SequenceEqual(fresh.Select(p => p.ProductId));
 
     private void ApplyFilter()
     {

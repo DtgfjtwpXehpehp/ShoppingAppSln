@@ -29,7 +29,16 @@ public class Product
     [Column("stock")]
     public int Stock { get; set; }
 
-    [Ignore] public string ImageSourcePath => ProductVisuals.ToImageSource(ImagePath);
-    [Ignore] public bool HasImage => ImageSourcePath.Length > 0;
+    [Ignore]
+    public string? ImageSourcePath
+    {
+        get
+        {
+            var path = ProductVisuals.ToImageSource(ImagePath);
+            return path.Length > 0 ? path : null;
+        }
+    }
+
+    [Ignore] public bool HasImage => ImageSourcePath is not null;
     [Ignore] public bool NoImage => !HasImage;
 }
