@@ -5,7 +5,9 @@ Everything runs locally: no server, no login.
 
 ## Entity Relationship Diagram
 
-![ERD](docs/ERD.png)
+![ERD](https://github.com/DtgfjtwpXehpehp/ShoppingAppSln/blob/79313855cd6815d5f7d8b160aa59075074b19bbe/ShoppingApp/docs/fresh_basket.drawio.png)
+
+
 
 | Relationship | Cardinality |
 |---|---|

@@ -71,4 +71,8 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="docs\" />
+	</ItemGroup>
+
 </Project>
